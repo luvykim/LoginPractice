@@ -1,0 +1,19 @@
+server:
+   port: 8080
+spring:
+   mvc:
+       hiddenmethod:
+          filter:
+             enabled: true
+   datasource:
+      url: jdbc:mysql://localhost:3306/myreactapp?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      username: root
+      password: 1234
+      driver-class-name: com.mysql.cj.jdbc.Driver
+   jpa:
+      show-sql: true
+mybatis:
+   mapper-locations: mapper/*.xml
+   type-aliases-package: com.example.demo.vo
+jwt:
+  secret: jwtsecretkey
