@@ -11,8 +11,13 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
+import com.example.demo.common.annotation.AfterLogging;
+import com.example.demo.common.annotation.AfterReturnLogging;
+import com.example.demo.common.annotation.BeforeLogging;
+import com.example.demo.common.annotation.PerLogging;
 import com.example.demo.service.LoginService;
 import com.example.demo.vo.LoginRequest;
+import com.example.demo.vo.ModifyRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,12 +63,17 @@ public class LoginController {
     /***
      * 로그인 요청
      * 
-     * @param member
+     * @param loginRequest
      * @param request
      * @param response
      * @param model
      * @return
      */
+    // @ModelAttribute는 생략할 수 있다. 그러나 @RequestParam도 생략할 수 있으니 혼란이 발생할 수 있다.
+    @PerLogging
+    @BeforeLogging
+    @AfterLogging
+    @AfterReturnLogging
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public String login(LoginRequest loginRequest, HttpServletRequest request,
             HttpServletResponse response, Model model) {
@@ -82,6 +92,7 @@ public class LoginController {
                     setPath("/");
                 }
             });
+
             // 화면에 표시할 ID 셋팅
             model.addAttribute("username", loginRequest.getUsername());
             return "success";
@@ -90,6 +101,12 @@ public class LoginController {
             return "error";
         }
     }
+
+    // @RequestMapping(value = "/test", method = RequestMethod.GET)
+    // public String test() {
+    // log.info("test");
+    // return loginService.loginn();
+    // }
 
     /***
      * 로그아웃 요청
@@ -102,5 +119,10 @@ public class LoginController {
         // 세션 저장소 세션 제거
         request.getSession().invalidate();
         return "redirect:/";
+    }
+
+    @RequestMapping(value = "/modify", method = RequestMethod.GET)
+    public String modify(ModifyRequest modifyRequest, HttpServletRequest request) {
+        return "modify";
     }
 }

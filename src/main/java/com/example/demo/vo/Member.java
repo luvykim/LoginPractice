@@ -28,5 +28,5 @@ public class Member {
     private String address;
     private String regist_date;
     private String update_date;
-
+    private String role;
 }
