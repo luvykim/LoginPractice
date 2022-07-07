@@ -11,11 +11,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
-import com.example.demo.common.annotation.AfterLogging;
-import com.example.demo.common.annotation.AfterReturnLogging;
-import com.example.demo.common.annotation.BeforeLogging;
+import com.example.demo.common.annotation.Auth;
 import com.example.demo.common.annotation.PerLogging;
 import com.example.demo.service.LoginService;
+import com.example.demo.service.MemberService;
 import com.example.demo.vo.LoginRequest;
 import com.example.demo.vo.ModifyRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +28,8 @@ public class LoginController {
     // private MemberRepository memberRepository;
     @Autowired
     private final LoginService loginService;
+    @Autowired
+    private final MemberService memberService;
 
     /***
      * 로그인 페이지
@@ -71,9 +72,6 @@ public class LoginController {
      */
     // @ModelAttribute는 생략할 수 있다. 그러나 @RequestParam도 생략할 수 있으니 혼란이 발생할 수 있다.
     @PerLogging
-    @BeforeLogging
-    @AfterLogging
-    @AfterReturnLogging
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public String login(LoginRequest loginRequest, HttpServletRequest request,
             HttpServletResponse response, Model model) {
@@ -84,7 +82,8 @@ public class LoginController {
             // 세션 저장 (세션 ID, 사용자 정보)
             // 세션은 브라우저 당 1개 생성(시크릿 모드도 동일, 같은 브라우저에서 새탭 or 새창 띄워도 로그인 유지) / 쿠키는 시크릿 모드시 없어짐
             request.getSession().setAttribute("username", loginRequest.getUsername());
-
+            request.getSession().setAttribute("role",
+                    memberService.getRole(loginRequest.getUsername()));
             // 쿠키 전달 (세션 ID)
             response.addCookie(new Cookie("AUTH", request.getSession().getId()) {
                 {
@@ -102,12 +101,6 @@ public class LoginController {
         }
     }
 
-    // @RequestMapping(value = "/test", method = RequestMethod.GET)
-    // public String test() {
-    // log.info("test");
-    // return loginService.loginn();
-    // }
-
     /***
      * 로그아웃 요청
      * 
@@ -121,8 +114,9 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/modify", method = RequestMethod.GET)
-    public String modify(ModifyRequest modifyRequest, HttpServletRequest request) {
-        return "modify";
+    @Auth
+    @RequestMapping(value = "/admin", method = RequestMethod.GET)
+    public String goAdmin(ModifyRequest modifyRequest, HttpServletRequest request) {
+        return "admin";
     }
 }

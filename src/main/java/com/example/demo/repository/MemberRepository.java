@@ -20,4 +20,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // Member modifyMember(@Param(value = "user_id") String user_id,
     // @Param(value = "user_password") String user_password,
     // @Param(value = "user_updated_password") String user_updated_password);
+
+    @Query("select m.role from Member m where m.user_id = :user_id")
+    String findRole(@Param(value = "user_id") String user_id);
 }
